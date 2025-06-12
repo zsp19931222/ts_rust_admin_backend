@@ -10,6 +10,7 @@ use std::io;
 use handlers::health::health_check;
 use handlers::simple_string::get_string;
 use handlers::course::{get_courses, create_course};
+use std::env;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -24,6 +25,8 @@ async fn main() -> io::Result<()> {
         .expect("Failed to initialize database");
 
     println!("Server running at http://localhost:8080");
+// 获取环境变量中的端口，默认为8080
+let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
 
     HttpServer::new(move || {
         App::new()
@@ -33,7 +36,7 @@ async fn main() -> io::Result<()> {
             .service(get_courses)
             .service(create_course)
     })
-    .bind("127.0.0.1:8080")?
+    .bind(format!("0.0.0.0:{}", port))?
     .run()
     .await
 } 
